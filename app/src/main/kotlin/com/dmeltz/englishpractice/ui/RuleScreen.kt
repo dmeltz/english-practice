@@ -18,11 +18,12 @@ import com.dmeltz.englishpractice.core.AnswerRecord
 import com.dmeltz.englishpractice.core.AppState
 import com.dmeltz.englishpractice.core.Mastery
 import com.dmeltz.englishpractice.core.Rule
+import com.dmeltz.englishpractice.core.RuleDetails
 import com.dmeltz.englishpractice.today
 import java.time.LocalDate
 
 @Composable
-fun RuleScreen(rule: Rule, state: AppState, answers: List<AnswerRecord>, onBack: () -> Unit) {
+fun RuleScreen(rule: Rule, details: RuleDetails?, state: AppState, answers: List<AnswerRecord>, onBack: () -> Unit) {
     val stats = state.ruleStats(rule.id)
     val score = Mastery.score(stats, today())
     val mistakes = answers.filter { !it.correct && !it.retry }.sortedByDescending { it.timestamp }.take(15)
@@ -42,6 +43,10 @@ fun RuleScreen(rule: Rule, state: AppState, answers: List<AnswerRecord>, onBack:
                 Text("Not started yet", style = MaterialTheme.typography.titleMedium)
             }
             Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) { RuleText(rule) } }
+            details?.let {
+                Text("In detail", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                RuleDetailsView(it)
+            }
             if (mistakes.isNotEmpty()) {
                 Text("Recent mistakes", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 for (m in mistakes) {

@@ -107,6 +107,7 @@ class MainActivity : ComponentActivity() {
                     )
                     is Screen.Rule -> RuleScreen(
                         rule = repo.curriculum.rule(screen.ruleId),
+                        details = repo.curriculum.details(screen.ruleId),
                         state = state,
                         answers = remember(screen.ruleId) {
                             repo.answers().filter { screen.ruleId in it.ruleIds }

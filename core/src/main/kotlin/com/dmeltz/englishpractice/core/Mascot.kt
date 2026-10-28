@@ -74,6 +74,8 @@ object Mascot {
             seed,
         )
 
+    fun explaining(): String = "Let me explain this one properly, with examples."
+
     fun retry(): String = "Let's try this one again."
 
     fun sessionDone(correct: Int, total: Int, weakestRule: Rule?): String {

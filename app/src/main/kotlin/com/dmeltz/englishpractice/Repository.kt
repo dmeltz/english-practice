@@ -20,7 +20,8 @@ fun today(): Day = LocalDate.now().toEpochDay()
 class Repository private constructor(private val context: Context) {
 
     val curriculum: Curriculum by lazy {
-        CurriculumParser.parse(context.assets.open("curriculum.txt").bufferedReader().use { it.readText() })
+        fun asset(name: String) = context.assets.open(name).bufferedReader().use { it.readText() }
+        CurriculumParser.parse(asset("curriculum.txt"), asset("rule_details.txt"))
     }
 
     private val stateFile = File(context.filesDir, "state.json")

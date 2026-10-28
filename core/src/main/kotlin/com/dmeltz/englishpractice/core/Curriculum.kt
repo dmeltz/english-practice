@@ -32,7 +32,20 @@ data class Item(
     val displayAnswer: String get() = stripFocus(answers.first())
 }
 
-data class Curriculum(val rules: List<Rule>, val items: List<Item>) {
+data class BadExample(val wrong: String, val right: String, val why: String?)
+
+/** The longer explanation of a rule, shown under "More detail". */
+data class RuleDetails(
+    val paragraphs: List<String>,
+    val good: List<String>,
+    val bad: List<BadExample>,
+)
+
+data class Curriculum(
+    val rules: List<Rule>,
+    val items: List<Item>,
+    val details: Map<String, RuleDetails> = emptyMap(),
+) {
     private val rulesById = rules.associateBy { it.id }
     private val itemsById = items.associateBy { it.id }
     private val itemsByRule = items.groupBy { it.primaryRuleId }
@@ -40,6 +53,7 @@ data class Curriculum(val rules: List<Rule>, val items: List<Item>) {
     fun rule(id: String): Rule = rulesById.getValue(id)
     fun item(id: String): Item? = itemsById[id]
     fun itemsFor(ruleId: String): List<Item> = itemsByRule[ruleId].orEmpty()
+    fun details(ruleId: String): RuleDetails? = details[ruleId]
 
     /** The order rules are introduced in: spelling and grammar alternate. */
     val introductionOrder: List<Rule> by lazy {
@@ -75,6 +89,60 @@ fun stripFocus(s: String): String = s.replace("[", "").replace("]", "")
  * extra rules. Lines starting with "//" and blank lines are ignored.
  */
 object CurriculumParser {
+    /** Parses the curriculum and, if given, the rule details file. */
+    fun parse(text: String, detailsText: String?): Curriculum {
+        val base = parse(text)
+        if (detailsText == null) return base
+        val details = parseDetails(detailsText)
+        val ruleIds = base.rules.map { it.id }.toSet()
+        details.keys.firstOrNull { it !in ruleIds }?.let { error("Details for unknown rule $it") }
+        return base.copy(details = details)
+    }
+
+    /**
+     * Parses the rule details format:
+     *
+     * ```
+     * @rule SP01
+     * detail: A paragraph.
+     * good: A correct example.
+     * bad: wrong sentence => right sentence | why it's wrong
+     * ```
+     */
+    fun parseDetails(text: String): Map<String, RuleDetails> {
+        val out = linkedMapOf<String, RuleDetails>()
+        var id: String? = null
+        val paragraphs = mutableListOf<String>()
+        val good = mutableListOf<String>()
+        val bad = mutableListOf<BadExample>()
+        fun flush() {
+            val ruleId = id ?: return
+            out[ruleId] = RuleDetails(paragraphs.toList(), good.toList(), bad.toList())
+            paragraphs.clear(); good.clear(); bad.clear()
+        }
+        text.lineSequence().forEachIndexed { index, raw ->
+            val line = raw.trim()
+            if (line.isEmpty() || line.startsWith("//")) return@forEachIndexed
+            fun fail(msg: String): Nothing = error("Details line ${index + 1}: $msg: $line")
+            when {
+                line.startsWith("@rule ") -> { flush(); id = line.removePrefix("@rule ").trim() }
+                id == null -> fail("line outside a rule")
+                line.startsWith("detail:") -> paragraphs += line.substringAfter(":").trim()
+                line.startsWith("good:") -> good += line.substringAfter(":").trim()
+                line.startsWith("bad:") -> {
+                    val body = line.substringAfter(":").trim()
+                    val parts = body.split(" => ", limit = 2)
+                    if (parts.size != 2) fail("bad example needs 'wrong => right'")
+                    val rightAndWhy = parts[1].split(" | ", limit = 2)
+                    bad += BadExample(parts[0].trim(), rightAndWhy[0].trim(), rightAndWhy.getOrNull(1)?.trim())
+                }
+                else -> fail("unrecognized line")
+            }
+        }
+        flush()
+        return out
+    }
+
     fun parse(text: String): Curriculum {
         val rules = mutableListOf<Rule>()
         val items = mutableListOf<Item>()

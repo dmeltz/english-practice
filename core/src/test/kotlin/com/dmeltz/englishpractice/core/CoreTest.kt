@@ -140,8 +140,13 @@ class CoreTest {
     @Test fun bundledCurriculumIsValid() {
         val file = File("../app/src/main/assets/curriculum.txt")
         if (!file.exists()) return
-        val c = CurriculumParser.parse(file.readText())
+        val c = CurriculumParser.parse(file.readText(), File("../app/src/main/assets/rule_details.txt").readText())
         assertEquals(32, c.rules.size)
+        for (rule in c.rules) {
+            val d = c.details(rule.id)
+            assertNotNull(d, "${rule.id} has no details")
+            assertTrue(d.paragraphs.size >= 2 && d.good.size >= 4 && d.bad.size >= 4, "${rule.id} details too short")
+        }
         for (rule in c.rules) {
             val items = c.itemsFor(rule.id)
             assertTrue(items.size >= 12, "${rule.id} has only ${items.size} items")

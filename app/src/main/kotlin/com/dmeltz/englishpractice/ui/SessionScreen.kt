@@ -16,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -171,7 +170,7 @@ fun SessionScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             when (val s = step) {
-                is Step.Reminder -> ReminderCard(s.rule, isNew = true) {
+                is Step.Reminder -> ReminderCard(s.rule, isNew = true, onMore = { reminderToShow = s.rule }) {
                     remindersShown += s.rule.id
                     step = stepAt(position)
                 }
@@ -194,12 +193,7 @@ fun SessionScreen(
     }
 
     reminderToShow?.let { rule ->
-        AlertDialog(
-            onDismissRequest = { reminderToShow = null },
-            confirmButton = { TextButton(onClick = { reminderToShow = null }) { Text("OK") } },
-            title = { Text(rule.title) },
-            text = { RuleText(rule) },
-        )
+        RuleDetailsDialog(rule, curriculum.details(rule.id)) { reminderToShow = null }
     }
 }
 
@@ -217,11 +211,14 @@ fun RuleText(rule: Rule) {
 }
 
 @Composable
-private fun ReminderCard(rule: Rule, isNew: Boolean, onContinue: () -> Unit) {
+private fun ReminderCard(rule: Rule, isNew: Boolean, onMore: () -> Unit, onContinue: () -> Unit) {
     PipSays(Mood.CALM, Mascot.teaching(isNew))
     Text(rule.title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) { RuleText(rule) }
+    }
+    OutlinedButton(onClick = onMore, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+        Text("More detail and examples")
     }
     Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().height(52.dp)) { Text("Let's practice") }
 }
@@ -366,7 +363,7 @@ private fun FeedbackView(
         Column(Modifier.padding(12.dp)) {
             Text(rule.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             Text(rule.reminder.lines().first(), style = MaterialTheme.typography.bodyMedium)
-            TextButton(onClick = { onShowRule(rule) }) { Text("Show the whole rule") }
+            TextButton(onClick = { onShowRule(rule) }) { Text("Explain this rule in detail") }
         }
     }
     if (entry.item.type == ExerciseType.LISTEN) {
