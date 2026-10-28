@@ -281,7 +281,7 @@ private fun QuestionView(entry: Entry, speaker: Speaker, onSubmit: (String) -> U
         value = typed,
         onValueChange = { typed = it },
         modifier = Modifier.fillMaxWidth().focusRequester(focus),
-        textStyle = MaterialTheme.typography.titleLarge,
+        textStyle = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface),
         placeholder = { Text("Your answer") },
         // Password-type keyboards don't offer suggestions or autocorrect, which would give the spelling away.
         // The text itself stays visible.
