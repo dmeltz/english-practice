@@ -20,7 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
 import com.dmeltz.englishpractice.core.AppState
 import com.dmeltz.englishpractice.core.SessionBuilder
-import com.dmeltz.englishpractice.core.SessionPlan
+import com.dmeltz.englishpractice.core.Sessions
 import com.dmeltz.englishpractice.reminder.Reminders
 import com.dmeltz.englishpractice.ui.AppTheme
 import com.dmeltz.englishpractice.ui.HomeScreen
@@ -32,7 +32,7 @@ import com.dmeltz.englishpractice.widget.StreakWidget
 
 sealed interface Screen {
     data object Home : Screen
-    data class Session(val plan: SessionPlan) : Screen
+    data class Session(val openedAt: Long) : Screen
     data object Progress : Screen
     data class Rule(val ruleId: String) : Screen
     data object Settings : Screen
@@ -54,15 +54,25 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AppTheme {
-                var state by remember { mutableStateOf(repo.state) }
+                var state by remember {
+                    // A session whose last answer was given while the app was closed still counts.
+                    mutableStateOf(Sessions.settle(repo.state).also { if (it != repo.state) repo.save(it) })
+                }
                 var stack by remember { mutableStateOf(listOf<Screen>(Screen.Home)) }
                 val screen = stack.last()
 
                 fun push(s: Screen) { stack = stack + s }
-                fun pop() { if (stack.size > 1) stack = stack.dropLast(1) }
                 fun update(newState: AppState) {
                     repo.save(newState)
                     state = newState
+                }
+                fun pop() {
+                    if (stack.size <= 1) return
+                    if (stack.last() is Screen.Session) {
+                        update(Sessions.settle(state))
+                        StreakWidget.updateAll(this@MainActivity)
+                    }
+                    stack = stack.dropLast(1)
                 }
 
                 val askNotifications = rememberLauncherForActivityResult(
@@ -78,13 +88,15 @@ class MainActivity : ComponentActivity() {
                     Screen.Home -> HomeScreen(
                         state = state,
                         onStart = {
-                            push(Screen.Session(SessionBuilder.build(repo.curriculum, state, today())))
+                            val plan = SessionBuilder.build(repo.curriculum, state, today())
+                            update(Sessions.start(state, plan, today()))
+                            push(Screen.Session(System.currentTimeMillis()))
                         },
+                        onContinue = { push(Screen.Session(System.currentTimeMillis())) },
                         onProgress = { push(Screen.Progress) },
                         onSettings = { push(Screen.Settings) },
                     )
                     is Screen.Session -> SessionScreen(
-                        plan = screen.plan,
                         curriculum = repo.curriculum,
                         initialState = state,
                         speaker = speaker,
@@ -94,10 +106,7 @@ class MainActivity : ComponentActivity() {
                             StreakWidget.updateAll(this@MainActivity)
                             stack = listOf(Screen.Home)
                         },
-                        onQuit = {
-                            StreakWidget.updateAll(this@MainActivity)
-                            pop()
-                        },
+                        onQuit = ::pop,
                     )
                     Screen.Progress -> ProgressScreen(
                         state = state,

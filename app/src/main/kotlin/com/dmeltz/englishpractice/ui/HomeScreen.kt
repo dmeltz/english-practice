@@ -16,17 +16,21 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dmeltz.englishpractice.core.AppState
 import com.dmeltz.englishpractice.core.Mascot
+import com.dmeltz.englishpractice.core.SessionBuilder
+import com.dmeltz.englishpractice.core.sessionToContinue
 import com.dmeltz.englishpractice.currentMood
 import com.dmeltz.englishpractice.today
 
@@ -36,6 +40,7 @@ fun HomeScreen(
     onStart: () -> Unit,
     onProgress: () -> Unit,
     onSettings: () -> Unit,
+    onContinue: () -> Unit,
 ) {
     val day = today()
     val done = state.practicedOn(day)
@@ -67,8 +72,39 @@ fun HomeScreen(
                 StatCard("Average grade", grade?.let { "$it%" } ?: "–", Modifier.weight(1f))
             }
             Spacer(Modifier.height(24.dp))
-            Button(onClick = onStart, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-                Text(if (done) "Practice again" else "Start today's practice", fontSize = 18.sp)
+            val unfinished = state.sessionToContinue(day)
+            val (answered, planned) = when {
+                unfinished != null -> unfinished.answeredCount to unfinished.plannedCount
+                done -> 1 to 1
+                else -> 0 to SessionBuilder.SESSION_SIZE
+            }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text("Today's practice", style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                Text(
+                    if (done && unfinished == null) "Done ✓" else "$answered of $planned exercises",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = if (done && unfinished == null) Good else MaterialTheme.colorScheme.onSurface,
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            LinearProgressIndicator(
+                progress = { answered.toFloat() / planned },
+                modifier = Modifier.fillMaxWidth().height(12.dp),
+                color = Good,
+                trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                strokeCap = StrokeCap.Round,
+                drawStopIndicator = {},
+                gapSize = 0.dp,
+            )
+            Spacer(Modifier.height(20.dp))
+            if (unfinished != null) {
+                Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+                    Text("Continue today's practice", fontSize = 18.sp)
+                }
+            } else {
+                Button(onClick = onStart, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+                    Text(if (done) "Practice again" else "Start today's practice", fontSize = 18.sp)
+                }
             }
             Spacer(Modifier.height(12.dp))
             OutlinedButton(onClick = onProgress, modifier = Modifier.fillMaxWidth().height(48.dp)) {

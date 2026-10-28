@@ -95,6 +95,7 @@ data class AppState(
     val reminderHour: Int = 20,
     val reminderMinute: Int = 0,
     val reminderEnabled: Boolean = true,
+    val activeSession: ActiveSession? = null,
 ) {
     fun ruleStats(id: String): RuleStats = rules[id] ?: RuleStats()
 

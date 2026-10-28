@@ -183,4 +183,30 @@ class CoreTest {
         assertEquals(Mood.CALM, Mascot.mood(done, 6, 8))
         assertEquals(Mascot.greeting(Mood.ANGRY, 3, 5), Mascot.greeting(Mood.ANGRY, 3, 5))
     }
+
+    @Test fun sessionCanBeContinuedAndCountsProgress() {
+        val plan = SessionPlan(listOf(curriculum.rule("SP01")), curriculum.itemsFor("SP01"))
+        var state = Sessions.start(AppState(), plan, 3)
+        assertTrue(state.ruleStats("SP01").introduced)
+        assertEquals(3, state.sessionToContinue(3)!!.plannedCount)
+
+        val first = curriculum.item(state.activeSession!!.next()!!.itemId)!!
+        state = Sessions.answer(state, first, AnswerChecker.check(first, "wrong"), 3)
+        val s = state.sessionToContinue(3)!!
+        assertEquals(1, s.answeredCount)
+        assertEquals(4, s.entries.size)
+        assertTrue(s.entries.last().retry)
+        assertEquals(null, state.sessionToContinue(4))
+
+        while (state.activeSession!!.next() != null) {
+            val item = curriculum.item(state.activeSession!!.next()!!.itemId)!!
+            state = Sessions.answer(state, item, AnswerChecker.check(item, item.displayAnswer), 3)
+        }
+        assertEquals(3, state.activeSession!!.answeredCount)
+        assertEquals(2, state.activeSession!!.firstTryCorrect)
+        assertEquals(null, state.sessionToContinue(3))
+        state = Sessions.finish(state, 3)
+        assertEquals(null, state.activeSession)
+        assertTrue(state.practicedOn(3))
+    }
 }

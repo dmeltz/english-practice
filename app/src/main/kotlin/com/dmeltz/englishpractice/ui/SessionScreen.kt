@@ -30,8 +30,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -52,6 +51,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dmeltz.englishpractice.Speaker
+import com.dmeltz.englishpractice.core.ActiveSession
 import com.dmeltz.englishpractice.core.AnswerChecker
 import com.dmeltz.englishpractice.core.AnswerRecord
 import com.dmeltz.englishpractice.core.AppState
@@ -62,9 +62,8 @@ import com.dmeltz.englishpractice.core.ExerciseType
 import com.dmeltz.englishpractice.core.Mascot
 import com.dmeltz.englishpractice.core.Mood
 import com.dmeltz.englishpractice.core.Item
-import com.dmeltz.englishpractice.core.Progress
 import com.dmeltz.englishpractice.core.Rule
-import com.dmeltz.englishpractice.core.SessionPlan
+import com.dmeltz.englishpractice.core.Sessions
 import com.dmeltz.englishpractice.core.TextDiff
 import com.dmeltz.englishpractice.today
 
@@ -79,7 +78,6 @@ private sealed interface Step {
 
 @Composable
 fun SessionScreen(
-    plan: SessionPlan,
     curriculum: Curriculum,
     initialState: AppState,
     speaker: Speaker,
@@ -89,51 +87,46 @@ fun SessionScreen(
     onQuit: () -> Unit,
 ) {
     val day = remember { today() }
-    // New rules start when the session opens, so each reminder is shown once.
-    var state by remember {
-        mutableStateOf(plan.newRules.fold(initialState) { s, r -> Progress.introduceRule(s, r.id, day) })
+    // The session lives in the app state and is saved after every answer, so it can be continued later.
+    var state by remember { mutableStateOf(initialState) }
+    fun update(newState: AppState) {
+        state = newState
+        onState(newState)
     }
-    LaunchedEffect(Unit) { onState(state) }
-    val sessionNumber = remember { initialState.sessionsCompleted + 1 }
-    val queue = remember { mutableStateListOf(*plan.items.map { Entry(it, retry = false) }.toTypedArray()) }
-    val remindersShown = remember { mutableSetOf<String>() }
-    var position by remember { mutableIntStateOf(0) }
-    var firstTryCorrect by remember { mutableIntStateOf(0) }
-    val missedRules = remember { mutableListOf<String>() }
-    val newRuleIds = remember { plan.newRules.map { it.id }.toSet() }
+    val session = state.activeSession
     var reminderToShow by remember { mutableStateOf<Rule?>(null) }
+    // The answer just given, shown until "Continue".
+    var feedback by remember { mutableStateOf<Step.Feedback?>(null) }
+    // Kept for the summary after the session is finished and cleared from the state.
+    var finished by remember { mutableStateOf<ActiveSession?>(null) }
 
-    fun stepAt(index: Int): Step {
-        if (index >= queue.size) return Step.Done
-        val entry = queue[index]
-        val ruleId = entry.item.primaryRuleId
-        if (ruleId in newRuleIds && ruleId !in remindersShown) {
-            return Step.Reminder(curriculum.rule(ruleId))
+    val step: Step = feedback ?: run {
+        val current = session ?: return@run Step.Done
+        val entry = current.next() ?: return@run Step.Done
+        val e = Entry(curriculum.item(entry.itemId) ?: return@run Step.Done, entry.retry)
+        val ruleId = e.item.primaryRuleId
+        if (!e.retry && ruleId in current.newRuleIds && ruleId !in current.remindersShown) {
+            Step.Reminder(curriculum.rule(ruleId))
+        } else {
+            Step.Question(e)
         }
-        return Step.Question(entry)
     }
 
-    var step by remember { mutableStateOf(stepAt(0)) }
-
-    fun advance() {
-        position++
-        step = stepAt(position)
-        if (step == Step.Done) {
-            val finished = Progress.completeSession(state, day)
-            state = finished
-            onState(finished)
+    LaunchedEffect(step == Step.Done) {
+        if (step == Step.Done && finished == null && session != null) {
+            finished = session
+            update(Sessions.finish(state, day))
         }
     }
 
     fun submit(entry: Entry, typed: String) {
+        val current = state.activeSession ?: return
         val result = AnswerChecker.check(entry.item, typed)
-        if (!entry.retry && result.correct) firstTryCorrect++
-        if (!entry.retry && !result.ruleCorrect) missedRules += entry.item.primaryRuleId
         onAnswer(
             AnswerRecord(
                 timestamp = System.currentTimeMillis(),
                 day = day,
-                session = sessionNumber,
+                session = current.number,
                 itemId = entry.item.id,
                 ruleIds = entry.item.ruleIds,
                 type = entry.item.type,
@@ -147,12 +140,13 @@ fun SessionScreen(
                 retry = entry.retry,
             ),
         )
-        val updated = Progress.applyAnswer(state, entry.item, result, day, entry.retry)
-        state = updated
-        onState(updated)
-        if (!result.correct && !entry.retry) queue.add(Entry(entry.item, retry = true))
-        step = Step.Feedback(entry, typed, result)
+        update(Sessions.answer(state, entry.item, result, day))
+        feedback = Step.Feedback(entry, typed, result)
     }
+
+    val shown = session ?: finished
+    val answered = shown?.answeredCount ?: 0
+    val planned = shown?.plannedCount ?: 0
 
     Column(Modifier.fillMaxSize().padding(top = 32.dp).imePadding()) {
         Row(
@@ -161,8 +155,18 @@ fun SessionScreen(
         ) {
             IconButton(onClick = onQuit) { Icon(Icons.Filled.Close, contentDescription = "Stop") }
             LinearProgressIndicator(
-                progress = { if (queue.isEmpty()) 1f else (position.toFloat() / queue.size).coerceIn(0f, 1f) },
-                modifier = Modifier.weight(1f).padding(end = 16.dp),
+                progress = { if (planned == 0) 1f else answered.toFloat() / planned },
+                modifier = Modifier.weight(1f).height(10.dp),
+                color = Good,
+                trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                strokeCap = StrokeCap.Round,
+                drawStopIndicator = {},
+                gapSize = 0.dp,
+            )
+            Text(
+                "$answered / $planned",
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(start = 10.dp, end = 16.dp),
             )
         }
         Column(
@@ -171,23 +175,25 @@ fun SessionScreen(
         ) {
             when (val s = step) {
                 is Step.Reminder -> ReminderCard(s.rule, isNew = true, onMore = { reminderToShow = s.rule }) {
-                    remindersShown += s.rule.id
-                    step = stepAt(position)
+                    update(Sessions.reminderShown(state, s.rule.id))
                 }
                 is Step.Question -> QuestionView(s.entry, speaker) { typed -> submit(s.entry, typed) }
                 is Step.Feedback -> FeedbackView(
                     s.entry, s.typed, s.result, curriculum, speaker,
                     onShowRule = { reminderToShow = it },
-                    onNext = ::advance,
+                    onNext = { feedback = null },
                 )
-                Step.Done -> DoneView(
-                    correct = firstTryCorrect,
-                    total = plan.items.size,
-                    state = state,
-                    weakestRule = missedRules.groupingBy { it }.eachCount().maxByOrNull { it.value }
-                        ?.let { curriculum.rule(it.key) },
-                    onFinish = onFinished,
-                )
+                Step.Done -> {
+                    val done = finished ?: session
+                    DoneView(
+                        correct = done?.firstTryCorrect ?: 0,
+                        total = planned,
+                        state = state,
+                        weakestRule = done?.missedRuleIds.orEmpty().groupingBy { it }.eachCount()
+                            .maxByOrNull { it.value }?.let { curriculum.rule(it.key) },
+                        onFinish = onFinished,
+                    )
+                }
             }
         }
     }
