@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +35,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     Page(title = "Settings", onBack = onBack) { padding ->
         Column(
-            Modifier.fillMaxSize().padding(padding).padding(16.dp),
+            Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text("Daily reminder", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -57,6 +59,10 @@ fun SettingsScreen(
                     "Upload it to the English App project so Claude can analyze it and adjust the practice.",
             )
             Button(onClick = onExport) { Text("Export answer log") }
+
+            HorizontalDivider()
+            Text("App updates", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            UpdatePanel(compact = false)
 
             HorizontalDivider()
             Text("Version $version · $itemCount practice items", style = MaterialTheme.typography.bodySmall)

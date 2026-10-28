@@ -56,6 +56,7 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            UpdatePanel(compact = true)
             val mood = currentMood(state)
             Pip(mood, 150.dp)
             Spacer(Modifier.height(8.dp))
