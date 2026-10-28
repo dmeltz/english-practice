@@ -125,3 +125,7 @@ object BuildConfigInfo {
     fun versionName(context: Context): String =
         context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "?"
 }
+
+/** Pip's mood right now. */
+fun currentMood(state: AppState): com.dmeltz.englishpractice.core.Mood =
+    com.dmeltz.englishpractice.core.Mascot.mood(state, today(), java.time.LocalTime.now().hour)

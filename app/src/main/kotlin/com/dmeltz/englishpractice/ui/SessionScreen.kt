@@ -60,6 +60,8 @@ import com.dmeltz.englishpractice.core.CheckResult
 import com.dmeltz.englishpractice.core.Curriculum
 import com.dmeltz.englishpractice.core.DiffKind
 import com.dmeltz.englishpractice.core.ExerciseType
+import com.dmeltz.englishpractice.core.Mascot
+import com.dmeltz.englishpractice.core.Mood
 import com.dmeltz.englishpractice.core.Item
 import com.dmeltz.englishpractice.core.Progress
 import com.dmeltz.englishpractice.core.Rule
@@ -98,6 +100,7 @@ fun SessionScreen(
     val remindersShown = remember { mutableSetOf<String>() }
     var position by remember { mutableIntStateOf(0) }
     var firstTryCorrect by remember { mutableIntStateOf(0) }
+    val missedRules = remember { mutableListOf<String>() }
     val newRuleIds = remember { plan.newRules.map { it.id }.toSet() }
     var reminderToShow by remember { mutableStateOf<Rule?>(null) }
 
@@ -126,6 +129,7 @@ fun SessionScreen(
     fun submit(entry: Entry, typed: String) {
         val result = AnswerChecker.check(entry.item, typed)
         if (!entry.retry && result.correct) firstTryCorrect++
+        if (!entry.retry && !result.ruleCorrect) missedRules += entry.item.primaryRuleId
         onAnswer(
             AnswerRecord(
                 timestamp = System.currentTimeMillis(),
@@ -181,6 +185,8 @@ fun SessionScreen(
                     correct = firstTryCorrect,
                     total = plan.items.size,
                     state = state,
+                    weakestRule = missedRules.groupingBy { it }.eachCount().maxByOrNull { it.value }
+                        ?.let { curriculum.rule(it.key) },
                     onFinish = onFinished,
                 )
             }
@@ -212,7 +218,7 @@ fun RuleText(rule: Rule) {
 
 @Composable
 private fun ReminderCard(rule: Rule, isNew: Boolean, onContinue: () -> Unit) {
-    Text(if (isNew) "New rule" else "Rule", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+    PipSays(Mood.CALM, Mascot.teaching(isNew))
     Text(rule.title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
     Card(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp)) { RuleText(rule) }
@@ -242,7 +248,7 @@ private fun QuestionView(entry: Entry, speaker: Speaker, onSubmit: (String) -> U
     }
 
     if (entry.retry) {
-        Text("Try this one again", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+        PipSays(Mood.WAITING, Mascot.retry(), size = 48.dp)
     }
     when (item.type) {
         ExerciseType.TRANSLATE -> {
@@ -315,10 +321,10 @@ private fun FeedbackView(
         if (entry.item.type == ExerciseType.LISTEN && !result.correct) speaker.speak(result.expected)
     }
     if (result.correct) {
-        Text("Correct!", style = MaterialTheme.typography.headlineMedium, color = Good, fontWeight = FontWeight.Bold)
+        PipSays(Mood.HAPPY, Mascot.correct(typed.hashCode().toLong()))
         Text(result.expected, style = MaterialTheme.typography.titleLarge)
     } else {
-        Text("Not quite", style = MaterialTheme.typography.headlineMedium, color = Bad, fontWeight = FontWeight.Bold)
+        PipSays(Mood.WAITING, Mascot.wrong(result.ruleCorrect, typed.hashCode().toLong()))
         val diff = TextDiff.diff(typed, result.expected)
         Text("You wrote", style = MaterialTheme.typography.labelLarge)
         Text(
@@ -373,11 +379,11 @@ private fun FeedbackView(
 }
 
 @Composable
-private fun DoneView(correct: Int, total: Int, state: AppState, onFinish: () -> Unit) {
+private fun DoneView(correct: Int, total: Int, state: AppState, weakestRule: Rule?, onFinish: () -> Unit) {
     val day = today()
     Spacer(Modifier.height(24.dp))
     Text("Practice done", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-    Text("$correct of $total right on the first try.", style = MaterialTheme.typography.titleMedium)
+    PipSays(Mood.HAPPY, Mascot.sessionDone(correct, total, weakestRule), size = 96.dp)
     Text("Streak: ${state.streak(day)} days", style = MaterialTheme.typography.titleMedium)
     state.averageGrade(day)?.let { Text("Average grade: $it%", style = MaterialTheme.typography.titleMedium) }
     Spacer(Modifier.height(12.dp))

@@ -15,7 +15,9 @@ import androidx.core.content.ContextCompat
 import com.dmeltz.englishpractice.MainActivity
 import com.dmeltz.englishpractice.R
 import com.dmeltz.englishpractice.Repository
+import com.dmeltz.englishpractice.currentMood
 import com.dmeltz.englishpractice.today
+import com.dmeltz.englishpractice.core.Mascot
 import com.dmeltz.englishpractice.widget.StreakWidget
 import java.time.LocalDate
 import java.time.LocalTime
@@ -61,9 +63,7 @@ object Reminders {
             context, 0, Intent(context, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-        val streak = state.streak(today())
-        val text = if (streak > 0) context.getString(R.string.reminder_text_streak, streak)
-        else context.getString(R.string.reminder_text)
+        val text = Mascot.greeting(currentMood(state), state.streak(today()), today())
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.reminder_title))

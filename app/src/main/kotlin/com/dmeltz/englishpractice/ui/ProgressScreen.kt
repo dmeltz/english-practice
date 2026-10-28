@@ -33,7 +33,9 @@ import com.dmeltz.englishpractice.core.AppState
 import com.dmeltz.englishpractice.core.Category
 import com.dmeltz.englishpractice.core.Curriculum
 import com.dmeltz.englishpractice.core.GradePoint
+import com.dmeltz.englishpractice.core.Mascot
 import com.dmeltz.englishpractice.core.Mastery
+import com.dmeltz.englishpractice.core.Mood
 import com.dmeltz.englishpractice.core.Rule
 import com.dmeltz.englishpractice.today
 import java.time.LocalDate
@@ -55,6 +57,15 @@ fun ProgressScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
+            item {
+                val mood = when {
+                    grade == null -> Mood.CALM
+                    grade >= 80 -> Mood.HAPPY
+                    grade >= 60 -> Mood.CALM
+                    else -> Mood.WAITING
+                }
+                PipSays(mood, Mascot.progressComment(state, curriculum, day), Modifier.padding(bottom = 12.dp))
+            }
             item {
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp)) {

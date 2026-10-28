@@ -10,9 +10,11 @@ import android.widget.RemoteViews
 import com.dmeltz.englishpractice.MainActivity
 import com.dmeltz.englishpractice.R
 import com.dmeltz.englishpractice.Repository
+import com.dmeltz.englishpractice.currentMood
 import com.dmeltz.englishpractice.today
+import com.dmeltz.englishpractice.ui.pipDrawable
 
-/** Home screen widget: streak, average grade, and whether today's practice is done. */
+/** 2x1 home screen widget: Pip (angrier as the day goes by without practice), streak and average grade. */
 class StreakWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
@@ -31,7 +33,7 @@ class StreakWidget : AppWidgetProvider() {
             val day = today()
             val streak = state.streak(day)
             val grade = state.averageGrade(day)
-            val done = state.practicedOn(day)
+            val mood = currentMood(state)
 
             val open = PendingIntent.getActivity(
                 context, 0,
@@ -39,20 +41,12 @@ class StreakWidget : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
             return RemoteViews(context.packageName, R.layout.widget_streak).apply {
-                setTextViewText(R.id.widget_streak, streak.toString())
-                setTextViewText(
-                    R.id.widget_streak_label,
-                    context.resources.getQuantityString(R.plurals.streak_days, streak),
-                )
-                setTextViewText(R.id.widget_grade, grade?.let { "$it%" } ?: "–")
-                setTextViewText(
-                    R.id.widget_status,
-                    context.getString(if (done) R.string.widget_done else R.string.widget_practice),
-                )
-                setInt(
-                    R.id.widget_status, "setBackgroundResource",
-                    if (done) R.drawable.widget_pill_done else R.drawable.widget_pill_todo,
-                )
+                for (id in intArrayOf(R.id.widget_pip_1, R.id.widget_pip_2, R.id.widget_pip_3)) {
+                    setImageViewResource(id, pipDrawable(mood, alt = false))
+                }
+                setImageViewResource(R.id.widget_pip_alt, pipDrawable(mood, alt = true))
+                setTextViewText(R.id.widget_streak, if (streak == 1) "1 day" else "$streak days")
+                setTextViewText(R.id.widget_grade, "Grade " + (grade?.let { "$it%" } ?: "–"))
                 setOnClickPendingIntent(R.id.widget_root, open)
             }
         }

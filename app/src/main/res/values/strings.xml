@@ -2,15 +2,6 @@
 <resources>
     <string name="app_name">English Practice</string>
     <string name="widget_description">Your streak and average grade</string>
-    <string name="widget_done">Done today</string>
-    <string name="widget_practice">Practice now</string>
-    <string name="widget_grade_label">grade</string>
-    <plurals name="streak_days">
-        <item quantity="one">day streak</item>
-        <item quantity="other">day streak</item>
-    </plurals>
     <string name="reminder_channel">Daily reminder</string>
-    <string name="reminder_title">Time for English practice</string>
-    <string name="reminder_text">5 minutes today keeps it sticking.</string>
-    <string name="reminder_text_streak">Keep your %1$d day streak going. It takes 5 minutes.</string>
+    <string name="reminder_title">Pip is waiting for you</string>
 </resources>

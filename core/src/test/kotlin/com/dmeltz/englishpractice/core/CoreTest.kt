@@ -166,4 +166,16 @@ class CoreTest {
         }
         assertTrue(problems.isEmpty(), problems.joinToString("\n"))
     }
+
+    @Test fun pipGetsAngrierThroughTheDay() {
+        val state = AppState(reminderHour = 20)
+        assertEquals(Mood.CALM, Mascot.mood(state, 5, 9))
+        assertEquals(Mood.WAITING, Mascot.mood(state, 5, 13))
+        assertEquals(Mood.ANNOYED, Mascot.mood(state, 5, 18))
+        assertEquals(Mood.ANGRY, Mascot.mood(state, 5, 21))
+        val done = Progress.completeSession(state, 5)
+        assertEquals(Mood.HAPPY, Mascot.mood(done, 5, 23))
+        assertEquals(Mood.CALM, Mascot.mood(done, 6, 8))
+        assertEquals(Mascot.greeting(Mood.ANGRY, 3, 5), Mascot.greeting(Mood.ANGRY, 3, 5))
+    }
 }

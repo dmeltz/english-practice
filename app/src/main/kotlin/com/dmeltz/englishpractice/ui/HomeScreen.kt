@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -24,6 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dmeltz.englishpractice.core.AppState
+import com.dmeltz.englishpractice.core.Mascot
+import com.dmeltz.englishpractice.currentMood
 import com.dmeltz.englishpractice.today
 
 @Composable
@@ -44,20 +48,25 @@ fun HomeScreen(
         },
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp),
+            modifier = Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            val mood = currentMood(state)
+            Pip(mood, 150.dp)
+            Spacer(Modifier.height(8.dp))
+            Card(Modifier.fillMaxWidth()) {
+                Text(
+                    Mascot.greeting(mood, state.streak(day), day),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+            Spacer(Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 StatCard("Day streak", state.streak(day).toString(), Modifier.weight(1f))
                 StatCard("Average grade", grade?.let { "$it%" } ?: "–", Modifier.weight(1f))
             }
-            Spacer(Modifier.height(32.dp))
-            Text(
-                if (done) "Today's practice is done. Extra practice still counts toward your scores."
-                else "About 5 minutes, 12 questions.",
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
             Button(onClick = onStart, modifier = Modifier.fillMaxWidth().height(56.dp)) {
                 Text(if (done) "Practice again" else "Start today's practice", fontSize = 18.sp)
             }
