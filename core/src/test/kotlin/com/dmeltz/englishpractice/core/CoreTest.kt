@@ -180,6 +180,31 @@ class CoreTest {
         assertTrue(problems.isEmpty(), problems.joinToString("\n"))
     }
 
+    @Test fun fixItemsAcceptJustTheCorrectedPart() {
+        val c = CurriculumParser.parse(
+            """
+            @rule SP01
+            category: spelling
+            title: t
+            reminder: r
+            F: א | I prefered tea. = I [preferred] tea.
+            F: ב | They are comeing tomorrow. = They are [coming] tomorrow.
+            T: ג = I [preferred] tea.
+            """.trimIndent(),
+        )
+        val fix = c.item("SP01-01")!!
+        for (typed in listOf("I preferred tea.", "i preferred", "preferred", "preferred tea")) {
+            assertTrue(AnswerChecker.check(fix, typed).correct, typed)
+        }
+        for (typed in listOf("i prefered", "tea", "I", "preferred coffee")) {
+            assertFalse(AnswerChecker.check(fix, typed).correct, typed)
+        }
+        assertTrue(AnswerChecker.check(c.item("SP01-02")!!, "they are coming").correct)
+        assertFalse(AnswerChecker.check(c.item("SP01-02")!!, "they are").correct)
+        // Translations still need the whole sentence.
+        assertFalse(AnswerChecker.check(c.item("SP01-03")!!, "preferred").correct)
+    }
+
     @Test fun hintsAndFirstLetters() {
         val c = CurriculumParser.parse(
             """

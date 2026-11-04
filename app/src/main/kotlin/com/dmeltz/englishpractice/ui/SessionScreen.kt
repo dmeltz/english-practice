@@ -294,7 +294,7 @@ private fun QuestionView(entry: Entry, speaker: Speaker, onSubmit: (String, Bool
             }
         }
         ExerciseType.FIX -> {
-            Text("Write the whole sentence correctly", style = MaterialTheme.typography.titleMedium)
+            Text("Fix the mistake (the corrected words are enough)", style = MaterialTheme.typography.titleMedium)
             HebrewText(item.hebrew.orEmpty())
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
                 Text(
