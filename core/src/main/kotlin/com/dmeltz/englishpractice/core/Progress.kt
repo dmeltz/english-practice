@@ -137,6 +137,8 @@ data class AnswerRecord(
     val mistake: MistakeKind? = null,
     /** A second try of an item already answered wrong in the same session. Doesn't change scores. */
     val retry: Boolean = false,
+    /** The hint was shown before this answer. */
+    val hinted: Boolean = false,
 )
 
 object Progress {

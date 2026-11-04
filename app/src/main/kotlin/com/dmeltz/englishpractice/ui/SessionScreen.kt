@@ -119,7 +119,7 @@ fun SessionScreen(
         }
     }
 
-    fun submit(entry: Entry, typed: String) {
+    fun submit(entry: Entry, typed: String, hinted: Boolean) {
         val current = state.activeSession ?: return
         val result = AnswerChecker.check(entry.item, typed)
         onAnswer(
@@ -138,6 +138,7 @@ fun SessionScreen(
                 ruleCorrect = result.ruleCorrect,
                 mistake = result.mistake,
                 retry = entry.retry,
+                hinted = hinted,
             ),
         )
         update(Sessions.answer(state, entry.item, result, day))
@@ -177,7 +178,7 @@ fun SessionScreen(
                 is Step.Reminder -> ReminderCard(s.rule, isNew = true, onMore = { reminderToShow = s.rule }) {
                     update(Sessions.reminderShown(state, s.rule.id))
                 }
-                is Step.Question -> QuestionView(s.entry, speaker) { typed -> submit(s.entry, typed) }
+                is Step.Question -> QuestionView(s.entry, speaker) { typed, hinted -> submit(s.entry, typed, hinted) }
                 is Step.Feedback -> FeedbackView(
                     s.entry, s.typed, s.result, curriculum, speaker,
                     onShowRule = { reminderToShow = it },
@@ -239,10 +240,27 @@ private fun HebrewText(text: String) {
     )
 }
 
+/** A "Show a hint" button; once pressed, the item's own hint (if any) and the first letter of each word. */
 @Composable
-private fun QuestionView(entry: Entry, speaker: Speaker, onSubmit: (String) -> Unit) {
+private fun HintView(item: Item, shown: Boolean, onShow: () -> Unit) {
+    if (!shown) {
+        TextButton(onClick = onShow) { Text("Show a hint") }
+        return
+    }
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            item.hint?.let { Text("Hint: $it", style = MaterialTheme.typography.bodyLarge) }
+            Text("Starts with: ${item.firstLetters}", style = MaterialTheme.typography.bodyLarge)
+        }
+    }
+}
+
+@Composable
+private fun QuestionView(entry: Entry, speaker: Speaker, onSubmit: (String, Boolean) -> Unit) {
     val item = entry.item
     var typed by remember(entry) { mutableStateOf("") }
+    // A second try after a wrong answer starts with the hint showing.
+    var hinted by remember(entry) { mutableStateOf(entry.retry) }
     val focus = remember(entry) { FocusRequester() }
 
     LaunchedEffect(entry) {
@@ -257,6 +275,7 @@ private fun QuestionView(entry: Entry, speaker: Speaker, onSubmit: (String) -> U
         ExerciseType.TRANSLATE -> {
             Text("Write in English", style = MaterialTheme.typography.titleMedium)
             HebrewText(item.hebrew.orEmpty())
+            HintView(item, shown = hinted, onShow = { hinted = true })
         }
         ExerciseType.LISTEN -> {
             Text("Type what you hear", style = MaterialTheme.typography.titleMedium)
@@ -275,7 +294,7 @@ private fun QuestionView(entry: Entry, speaker: Speaker, onSubmit: (String) -> U
             }
         }
         ExerciseType.FIX -> {
-            Text("Correct the English sentence", style = MaterialTheme.typography.titleMedium)
+            Text("Fix the mistake (the corrected words are enough)", style = MaterialTheme.typography.titleMedium)
             HebrewText(item.hebrew.orEmpty())
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
                 Text(
@@ -300,10 +319,10 @@ private fun QuestionView(entry: Entry, speaker: Speaker, onSubmit: (String) -> U
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done,
         ),
-        keyboardActions = KeyboardActions(onDone = { if (typed.isNotBlank()) onSubmit(typed) }),
+        keyboardActions = KeyboardActions(onDone = { if (typed.isNotBlank()) onSubmit(typed, hinted) }),
     )
     Button(
-        onClick = { onSubmit(typed) },
+        onClick = { onSubmit(typed, hinted) },
         enabled = typed.isNotBlank(),
         modifier = Modifier.fillMaxWidth().height(52.dp),
     ) { Text("Check") }

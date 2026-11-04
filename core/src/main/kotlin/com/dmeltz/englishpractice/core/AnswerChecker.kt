@@ -34,6 +34,9 @@ object AnswerChecker {
             if (tokens == typedTokens) {
                 return CheckResult(true, true, stripFocus(answer), null)
             }
+            if (item.type == ExerciseType.FIX && isFixedPart(answer, tokens, typedTokens)) {
+                return CheckResult(true, true, stripFocus(answer), null)
+            }
             val d = levenshtein(tokens.joinToString(" "), typedTokens.joinToString(" "))
             if (d < bestDistance) {
                 bestDistance = d
@@ -49,6 +52,18 @@ object AnswerChecker {
             expected = stripFocus(best),
             mistake = classify(canonicalTokens(best), typedTokens),
         )
+    }
+
+    /**
+     * For fix items, just the corrected part is enough: a run of words from the answer ("i preferred")
+     * that includes every tested part. An answer with no brackets still needs the whole sentence.
+     */
+    private fun isFixedPart(answer: String, tokens: List<String>, typed: List<String>): Boolean {
+        val parts = focusParts(answer).map { canonicalTokens(it) }
+        if (parts.isEmpty() || typed.isEmpty() || typed.size > tokens.size) return false
+        return (0..tokens.size - typed.size).any { start ->
+            tokens.subList(start, start + typed.size) == typed
+        } && parts.all { containsSequence(typed, it) }
     }
 
     /** Bracketed parts of an answer. An answer with no brackets has no separate focus. */
