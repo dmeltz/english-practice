@@ -81,8 +81,8 @@ class Repository private constructor(private val context: Context) {
         val answers: List<AnswerRecord>,
     )
 
-    /** Writes everything (progress and every answer) to one JSON file for sharing. */
-    fun writeExport(): File {
+    /** Everything (progress and every answer) as one JSON document. */
+    fun exportJson(): String {
         val day = today()
         val s = state
         val export = Export(
@@ -104,10 +104,15 @@ class Repository private constructor(private val context: Context) {
             state = s,
             answers = answers(),
         )
+        return Json { encodeDefaults = true; prettyPrint = true }.encodeToString(export)
+    }
+
+    /** Writes [exportJson] to a file for sharing. */
+    fun writeExport(): File {
         val dir = File(context.cacheDir, "exports").apply { mkdirs() }
         dir.listFiles()?.forEach { it.delete() }
         val file = File(dir, "english-practice-${LocalDate.now()}.json")
-        file.writeText(Json { encodeDefaults = true; prettyPrint = true }.encodeToString(export))
+        file.writeText(exportJson())
         return file
     }
 

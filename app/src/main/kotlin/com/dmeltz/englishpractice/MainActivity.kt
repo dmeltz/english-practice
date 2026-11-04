@@ -22,6 +22,7 @@ import com.dmeltz.englishpractice.core.AppState
 import com.dmeltz.englishpractice.core.SessionBuilder
 import com.dmeltz.englishpractice.core.Sessions
 import com.dmeltz.englishpractice.reminder.Reminders
+import com.dmeltz.englishpractice.sync.AnswerSync
 import com.dmeltz.englishpractice.ui.AppTheme
 import com.dmeltz.englishpractice.ui.HomeScreen
 import com.dmeltz.englishpractice.ui.ProgressScreen
@@ -63,8 +64,10 @@ class MainActivity : ComponentActivity() {
 
                 fun push(s: Screen) { stack = stack + s }
                 fun update(newState: AppState) {
+                    val finishedSession = newState.sessionsCompleted > state.sessionsCompleted
                     repo.save(newState)
                     state = newState
+                    if (finishedSession) AnswerSync.schedule(this@MainActivity)
                 }
                 fun pop() {
                     if (stack.size <= 1) return

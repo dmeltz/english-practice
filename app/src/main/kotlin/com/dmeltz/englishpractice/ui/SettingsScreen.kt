@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -53,12 +52,13 @@ fun SettingsScreen(
             }) { Text("Change reminder time") }
 
             HorizontalDivider()
-            Text("Share my answers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(
-                "Saves your progress and every answer, including all mistakes, as one file. " +
-                    "Upload it to the English App project so Claude can analyze it and adjust the practice.",
-            )
-            Button(onClick = onExport) { Text("Export answer log") }
+            Text("Send my answers to Claude", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            SyncPanel()
+
+            HorizontalDivider()
+            Text("Share my answers as a file", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text("Saves your progress and every answer, including all mistakes, as one file you can share.")
+            OutlinedButton(onClick = onExport) { Text("Export answer log") }
 
             HorizontalDivider()
             Text("App updates", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
