@@ -41,7 +41,7 @@ data class SyncSettings(
  * read it and adjust the app. The file is replaced each time; GitHub keeps every version in its history.
  */
 object AnswerSync {
-    const val DEFAULT_REPO = "dmeltz/english-practice-data"
+    const val DEFAULT_REPO = "dmeltz/my-practice-data"
     const val PATH = "progress/english-practice.json"
     private const val WORK_NAME = "send-answers"
 
