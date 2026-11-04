@@ -148,12 +148,11 @@ object AnswerSync {
     }
 
     class SendWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-        override suspend fun doWork(): androidx.work.ListenableWorker.Result = when (send(applicationContext)) {
-            Result.Sent -> androidx.work.ListenableWorker.Result.success()
-            is Result.Retry ->
-                if (runAttemptCount < 8) androidx.work.ListenableWorker.Result.retry()
-                else androidx.work.ListenableWorker.Result.failure()
-            is Result.Failed -> androidx.work.ListenableWorker.Result.failure()
+        // Inside a worker, a bare "Result" means WorkManager's result, so the sync result is named in full.
+        override suspend fun doWork(): Result = when (send(applicationContext)) {
+            AnswerSync.Result.Sent -> Result.success()
+            is AnswerSync.Result.Retry -> if (runAttemptCount < 8) Result.retry() else Result.failure()
+            is AnswerSync.Result.Failed -> Result.failure()
         }
     }
 }
