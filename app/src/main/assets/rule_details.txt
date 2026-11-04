@@ -36,6 +36,22 @@ bad: It was a lovly day. => It was a lovely day. | -ly starts with a consonant, 
 bad: I am hopping to see you. => I am hoping to see you. | hopping comes from hop (jump). hope → hoping.
 bad: He was very carful. => He was very careful. | keep the e before -ful.
 
+@rule SP17
+detail: These are words from your own answers that came out wrong more than once, outside the rule being practiced. Spelling them right is a matter of memory, so each one gets a small hook.
+detail: they: the pronoun always has a y; "the are" is a slip of the fingers worth watching. movie: the film is a movie, "move" is the verb. newspaper: news + paper, nothing added. language: l-a-n-g-u-a-g-e, the u comes after the g as in "guess". apartment: one p, a + part + ment.
+detail: father, mother, grandmother: all end in -ther. tomorrow: one m, two r's. excitement: ex + cite + ment, so the c stays and the e of excite stays before -ment. tired: t-i-r-e-d.
+good: They were tired after the trip.
+good: I read the newspaper every morning.
+good: She speaks three languages.
+good: My grandmother lives in a small apartment.
+good: We are going to watch a movie tomorrow.
+bad: The are at home. => They are at home. | they, with a y.
+bad: I read the newspapare. => I read the newspaper. | news + paper.
+bad: She speaks three languges. => She speaks three languages. | langu-age: the u comes before the a.
+bad: They moved to a new appartment. => They moved to a new apartment. | one p.
+bad: My fathre is tired. => My father is tired. | -ther, like mother.
+bad: See you tommorow. => See you tomorrow. | one m, two r's.
+
 @rule SP03
 detail: The letters c and g have a soft sound (s, j) before e, i and y, and a hard sound (k, g) before a, o and u. That's why words like notice and change keep their e before -able and -ous: without it, the c or g would sit before a or o and sound hard.
 detail: So: notice → noticeable, replace → replaceable, manage → manageable, change → changeable, courage → courageous, outrage → outrageous, advantage → advantageous.

@@ -13,11 +13,11 @@ example: run → running, stop → stopped, big → bigger
 example: begin → beginning, prefer → preferred
 example: open → opening, visit → visited (no doubling)
 T: הם הפסיקו לדבר = They [stopped] talking.
-T: אני רץ כל בוקר = I [run] every morning. || I go [running] every morning.
+T: אני רץ כל בוקר = I [run] every morning. || I go [running] every morning. ~ a habit, not something happening right now
 T: הוא יושב ליד החלון = He is [sitting] by the window. || He is [sitting] next to the window.
 T: הבית שלך גדול יותר = Your house is [bigger].
 T: היא תכננה את הטיול = She [planned] the trip.
-T: הסרט מתחיל עכשיו = The movie is [beginning] now. || The film is [beginning] now. || The movie [begins] now. || The film [begins] now.
+T: הסרט מתחיל עכשיו = The movie is [beginning] now. || The film is [beginning] now. || The movie [begins] now. || The film [begins] now. ~ use: begin
 T: הוא פתח את הדלת = He [opened] the door.
 T: ביקרנו את סבתא = We [visited] grandma. || We [visited] our grandmother. || We [visited] grandmother.
 L: [beginning]
@@ -31,6 +31,17 @@ L: [listening]
 F: אני מעדיף תה | I prefered tea. = I [preferred] tea.
 F: הם שוחים בים | They are swiming in the sea. = They are [swimming] in the sea.
 F: הוא שכח את המפתחות | He forgott the keys. = He [forgot] the keys.
+T: הוא הקשיב למוזיקה = He [listened] to music. || He [listened] to the music. ~ use: listen
+T: מה קרה? = What [happened]?
+T: היא ביקרה בלונדון = She [visited] London.
+T: הם הציעו לעזור = They [offered] to help. ~ use: offer
+T: הוא נכנס לחדר = He [entered] the room. ~ use: enter
+T: הילד קופץ על רגל אחת = The child is [hopping] on one leg. || The kid is [hopping] on one leg. ~ use: hop #SP02
+L: [opened]
+L: [visited]
+L: [offered]
+F: הוא פתח את החלון | He openned the window. = He [opened] the window.
+F: הם ביקרו אותנו | They visitted us. = They [visited] us.
 
 @rule SP02
 category: spelling
@@ -42,7 +53,7 @@ example: love → lovely, hope → hopeful, move → movement
 T: אני כותב מכתב = I am [writing] a letter.
 T: היא מכינה ארוחת ערב = She is [making] dinner.
 T: אנחנו מקווים שתבוא = We are [hoping] you will come. || We [hope] you will come.
-T: הם עוברים דירה = They are [moving] house. || They are [moving].
+T: הם עוברים דירה = They are [moving] house. || They are [moving]. || They are [moving] to a new apartment. || They are [moving] to a new flat. || They are [moving] apartments. || They are [moving] home.
 T: הוא נוהג לאט = He is [driving] slowly. || He [drives] slowly.
 T: איזה יום יפה = What a [lovely] day! || What a [nice] day!
 T: היא שמחה לעזור = She is [happy] to help. #SP04
@@ -58,6 +69,45 @@ L: [using]
 F: הם באים מחר | They are comeing tomorrow. = They are [coming] tomorrow.
 F: אני משתמש במחשב | I am useing the computer. = I am [using] the computer.
 F: היא כותבת ספר | She is writting a book. = She is [writing] a book.
+T: אני מקווה למזג אוויר טוב = I am [hoping] for good weather. || I [hope] for good weather. ~ use: hope
+T: הם באים הביתה = They are [coming] home. ~ use: come
+T: היא נותנת לי את המפתח = She is [giving] me the key. || She [gives] me the key. ~ use: give
+L: [excited]
+L: [coming]
+F: אנחנו מקווים שתבוא | We are hopping you will come. = We are [hoping] you will come. || We [hope] you will come.
+F: הייתה התרגשות גדולה | There was a lot of excitment. = There was a lot of [excitement].
+F: אני מלא תקווה | I am hopefull. = I am [hopeful]. #SP09
+
+// Built from Daniel's answer log: words he misspelled that no single rule covers.
+@rule SP17
+category: spelling
+title: My tricky words
+reminder: Words you misspelled in practice. No one rule covers them, so they get practice of their own.
+reminder: they (not "the"), movie (not "move"), newspaper = news + paper, language (langu-age), apartment (one p).
+reminder: father and grandmother end in -ther, tomorrow has one m and two r's, excitement keeps the c after ex.
+example: they were, a movie, the newspaper, three languages
+example: my father, my grandmother, a new apartment
+example: tired, tomorrow, excitement, doesn't know
+T: הם היו עייפים = [They] were [tired].
+T: אני קורא את העיתון = I am reading the [newspaper]. || I read the [newspaper].
+T: היא לומדת שפה חדשה = She is learning a new [language]. || She learns a new [language].
+T: סבתא שלי גרה בדירה = My [grandmother] lives in an [apartment]. || My [grandma] lives in an [apartment].
+T: ראינו סרט = We saw a [movie]. || We watched a [movie]. ~ not "film"
+T: אבא שלי לא יודע = My [father] [doesn't] [know]. || My [dad] [doesn't] [know].
+T: הם איחרו = [They] were late. || [They] came late.
+L: [newspaper]
+L: [languages]
+L: [grandmother]
+L: [apartment]
+L: [tomorrow]
+L: [tired]
+L: [movie]
+L: [excitement]
+F: הם איחרו | The were late. = [They] were late.
+F: אני קורא עיתון כל יום | I read the newspapare every day. = I read the [newspaper] every day.
+F: הוא מדבר שתי שפות | He speaks two languges. = He speaks two [languages].
+F: הם עוברים לדירה חדשה | They are moving to a new appartment. = They are moving to a new [apartment].
+F: אבא שלי עייף | My fathre is tired. = My [father] is tired.
 
 @rule SP03
 category: spelling
@@ -468,7 +518,7 @@ T: יש לו שני ילדים = [He has] two children. || [He has] two kids.
 T: אחי גר בחיפה = My brother [lives] in Haifa.
 T: הוא אוהב כדורגל = He [likes] football. || He [likes] soccer. || He [loves] football. || He [loves] soccer.
 T: הרכבת יוצאת בשמונה = The train [leaves] at eight. || The train [leaves] at 8.
-T: היא מדברת שלוש שפות = She [speaks] three languages.
+T: היא מדברת שלוש שפות = She [speaks] three languages. ~ use: speak. It is something she can do, not something happening right now
 T: אבא שלי קורא עיתון כל בוקר = My father [reads] the newspaper every morning. || My dad [reads] the newspaper every morning. || My father [reads] a newspaper every morning.
 T: זה עולה עשרה שקלים = It [costs] ten shekels. || It [costs] 10 shekels.
 L: She [teaches] English.
@@ -479,6 +529,12 @@ F: הוא עובד מהבית | He work from home. = He [works] from home.
 F: יש לה מכונית חדשה | She have a new car. = [She has] a new car.
 F: החנות נפתחת בתשע | The shop open at nine. = The shop [opens] at nine. || The shop [opens] at 9.
 F: הוא לא אוהב קפה | He don't like coffee. = He [doesn't] like coffee.
+T: היא מדברת אנגלית טוב = She [speaks] English well. ~ use: speak
+T: הוא שותה קפה כל בוקר = He [drinks] coffee every morning. ~ use: drink
+T: אמא שלי מבשלת כל יום = My mother [cooks] every day. || My mom [cooks] every day. || My mum [cooks] every day.
+T: הוא מלמד מתמטיקה = He [teaches] math. || He [teaches] maths. || He [teaches] mathematics.
+F: היא מדברת שתי שפות | She is speaking two languages. = She [speaks] two languages.
+F: אבא שלי קורא ספר כל ערב | My father read a book every evening. = My father [reads] a book every evening. || My dad [reads] a book every evening.
 
 @rule GR02
 category: grammar

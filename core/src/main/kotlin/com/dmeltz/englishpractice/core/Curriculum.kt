@@ -25,8 +25,18 @@ data class Item(
     val hebrew: String?,
     val wrong: String?,
     val answers: List<String>,
+    /** An optional hint shown on request, such as the word to use ("use: speak"). */
+    val hint: String? = null,
 ) {
     val primaryRuleId: String get() = ruleIds.first()
+
+    /**
+     * The first letter of each word of the first answer ("S… s… t… l…"). It shows which words and
+     * tense are expected without giving away any spelling past the first letter.
+     */
+    val firstLetters: String get() =
+        displayAnswer.split(Regex("""\s+""")).filter { it.isNotBlank() }
+            .joinToString(" ") { word -> word.firstOrNull { it.isLetterOrDigit() }?.let { "$it…" } ?: word }
 
     /** The first accepted answer, without focus brackets. Also what the phone reads for LISTEN items. */
     val displayAnswer: String get() = stripFocus(answers.first())
@@ -86,7 +96,7 @@ fun stripFocus(s: String): String = s.replace("[", "").replace("]", "")
  * ```
  *
  * Alternative answers are separated by " || ". A trailing " #GR09" tags an item with
- * extra rules. Lines starting with "//" and blank lines are ignored.
+ * extra rules. On translate and fix items, " ~ hint" before the tags adds a hint. Lines starting with "//" and blank lines are ignored.
  */
 object CurriculumParser {
     /** Parses the curriculum and, if given, the rule details file. */
@@ -196,6 +206,11 @@ object CurriculumParser {
                         extraRules += tagMatch.groupValues[1].split(Regex("""\s+#"""))
                         body = body.substring(0, tagMatch.range.first).trim()
                     }
+                    var hint: String? = null
+                    if (line[0] != 'L' && body.contains(" ~ ")) {
+                        hint = body.substringAfterLast(" ~ ").trim().ifEmpty { fail("empty hint") }
+                        body = body.substringBeforeLast(" ~ ").trim()
+                    }
                     val itemId = "$ruleId-%02d".format(itemCount)
                     val ruleIds = listOf(ruleId) + extraRules
                     fun answers(s: String) = s.split(" || ").map { it.trim() }.filter { it.isNotEmpty() }
@@ -203,14 +218,14 @@ object CurriculumParser {
                         'T' -> {
                             val parts = body.split(" = ", limit = 2)
                             if (parts.size != 2) fail("translate item needs 'hebrew = answer'")
-                            Item(itemId, ruleIds, ExerciseType.TRANSLATE, parts[0].trim(), null, answers(parts[1]))
+                            Item(itemId, ruleIds, ExerciseType.TRANSLATE, parts[0].trim(), null, answers(parts[1]), hint)
                         }
                         'L' -> Item(itemId, ruleIds, ExerciseType.LISTEN, null, null, answers(body))
                         else -> {
                             val parts = body.split(" = ", limit = 2)
                             val left = parts[0].split(" | ", limit = 2)
                             if (parts.size != 2 || left.size != 2) fail("fix item needs 'hebrew | wrong = answer'")
-                            Item(itemId, ruleIds, ExerciseType.FIX, left[0].trim(), left[1].trim(), answers(parts[1]))
+                            Item(itemId, ruleIds, ExerciseType.FIX, left[0].trim(), left[1].trim(), answers(parts[1]), hint)
                         }
                     }
                 }

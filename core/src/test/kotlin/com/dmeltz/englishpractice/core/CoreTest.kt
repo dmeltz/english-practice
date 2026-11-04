@@ -141,7 +141,7 @@ class CoreTest {
         val file = File("../app/src/main/assets/curriculum.txt")
         if (!file.exists()) return
         val c = CurriculumParser.parse(file.readText(), File("../app/src/main/assets/rule_details.txt").readText())
-        assertEquals(32, c.rules.size)
+        assertEquals(33, c.rules.size)
         for (rule in c.rules) {
             val d = c.details(rule.id)
             assertNotNull(d, "${rule.id} has no details")
@@ -164,12 +164,45 @@ class CoreTest {
                     if (tokens.windowed(f.size).none { it == f }) problems += "${item.id}: focus [$focus] in: $answer"
                 }
             }
+            // A hint must not give away a tested part.
+            item.hint?.let { hint ->
+                for (focus in Regex("""\[([^\]]+)]""").findAll(item.answers.first()).map { it.groupValues[1] }) {
+                    if (Regex("""\b${Regex.escape(focus.lowercase())}\b""").containsMatchIn(hint.lowercase())) {
+                        problems += "${item.id}: hint gives away [$focus]"
+                    }
+                }
+            }
             assertNotNull(item.answers.firstOrNull())
             assertEquals(
                 item.answers.first().count { it == '[' }, item.answers.first().count { it == ']' }, item.id,
             )
         }
         assertTrue(problems.isEmpty(), problems.joinToString("\n"))
+    }
+
+    @Test fun hintsAndFirstLetters() {
+        val c = CurriculumParser.parse(
+            """
+            @rule GR01
+            category: grammar
+            title: t
+            reminder: r
+            T: היא מדברת שלוש שפות = She [speaks] three languages. ~ use: speak #GR02
+            L: [doesn't]
+            F: א | He don't know. = He [doesn't] know.
+            @rule GR02
+            category: grammar
+            title: t2
+            reminder: r2
+            """.trimIndent(),
+        )
+        val t = c.item("GR01-01")!!
+        assertEquals("use: speak", t.hint)
+        assertEquals(listOf("GR01", "GR02"), t.ruleIds)
+        assertEquals(listOf("She [speaks] three languages."), t.answers)
+        assertEquals("S… s… t… l…", t.firstLetters)
+        assertEquals(null, c.item("GR01-03")!!.hint)
+        assertEquals("H… d… k…", c.item("GR01-03")!!.firstLetters)
     }
 
     @Test fun pipGetsAngrierThroughTheDay() {
