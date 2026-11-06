@@ -12,7 +12,8 @@ reminder: If the stress is earlier in the word, don't double.
 example: run → running, stop → stopped, big → bigger
 example: begin → beginning, prefer → preferred
 example: open → opening, visit → visited (no doubling)
-T: הם הפסיקו לדבר = They [stopped] talking.
+reminder: Watch the stress: OPen → opened, VISit → visited (stress first, so no doubling); beGIN → beginning (stress last, so double).
+T: הם הפסיקו לדבר = They [stopped] talking. || They [stopped] speaking.
 T: אני רץ כל בוקר = I [run] every morning. || I go [running] every morning. ~ a habit, not something happening right now
 T: הוא יושב ליד החלון = He is [sitting] by the window. || He is [sitting] next to the window.
 T: הבית שלך גדול יותר = Your house is [bigger].
@@ -25,7 +26,7 @@ L: [stopped]
 L: [swimming]
 L: [preferred]
 L: [shopping]
-L: [hottest]
+L: Today is the [hottest] day of the year.
 L: [happening]
 L: [listening]
 F: אני מעדיף תה | I prefered tea. = I [preferred] tea.
@@ -42,6 +43,14 @@ L: [visited]
 L: [offered]
 F: הוא פתח את החלון | He openned the window. = He [opened] the window.
 F: הם ביקרו אותנו | They visitted us. = They [visited] us.
+F: היא פתחה את הקופסה | She opend the box. = She [opened] the box.
+F: השיעור מתחיל | The lesson is begining. = The lesson is [beginning].
+F: הם הפסיקו לעבוד | They stoped working. = They [stopped] working.
+T: הכלב שלי גדול יותר = My dog is [bigger]. ~ use: big
+T: היא הפסיקה לעשן = She [stopped] smoking.
+T: החנות נפתחת עכשיו = The shop is [opening] now. ~ use: open
+L: [bigger]
+L: [beginning]
 
 @rule SP02
 category: spelling
@@ -50,6 +59,7 @@ reminder: A word ending in a silent e drops it before a suffix that starts with 
 reminder: Keep the e before a suffix that starts with a consonant (-ly, -ful, -ment, -ness).
 example: make → making, hope → hoping, use → usable
 example: love → lovely, hope → hopeful, move → movement
+reminder: Don't double after dropping the e: hope → hoping, come → coming. A double letter makes a different word: hopping = jumping on one leg.
 T: אני כותב מכתב = I am [writing] a letter.
 T: היא מכינה ארוחת ערב = She is [making] dinner.
 T: אנחנו מקווים שתבוא = We are [hoping] you will come. || We [hope] you will come.
@@ -77,6 +87,13 @@ L: [coming]
 F: אנחנו מקווים שתבוא | We are hopping you will come. = We are [hoping] you will come. || We [hope] you will come.
 F: הייתה התרגשות גדולה | There was a lot of excitment. = There was a lot of [excitement].
 F: אני מלא תקווה | I am hopefull. = I am [hopeful]. #SP09
+F: הם באים לבקר | They are comming to visit. = They are [coming] to visit.
+F: אני מקווה שזה יעבוד | I am hopping it will work. = I am [hoping] it will work. || I [hope] it will work.
+T: הוא קיווה שתתקשר = He [hoped] you would call. ~ use: hope
+T: היא באה איתנו = She is [coming] with us. || She [comes] with us. ~ use: come
+L: We are [hoping] for sun.
+L: They are [coming] now.
+L: She was very [hopeful].
 
 // Built from Daniel's answer log: words he misspelled that no single rule covers.
 @rule SP17
@@ -85,6 +102,7 @@ title: My tricky words
 reminder: Words you misspelled in practice. No one rule covers them, so they get practice of their own.
 reminder: they (not "the"), movie (not "move"), newspaper = news + paper, language (langu-age), apartment (one p).
 reminder: father and grandmother end in -ther, tomorrow has one m and two r's, excitement keeps the c after ex.
+reminder: live (גר, short i) vs leave (עוזב, long ee): We live here. We leave at eight.
 example: they were, a movie, the newspaper, three languages
 example: my father, my grandmother, a new apartment
 example: tired, tomorrow, excitement, doesn't know
@@ -108,6 +126,12 @@ F: אני קורא עיתון כל יום | I read the newspapare every day. = I
 F: הוא מדבר שתי שפות | He speaks two languges. = He speaks two [languages].
 F: הם עוברים לדירה חדשה | They are moving to a new appartment. = They are moving to a new [apartment].
 F: אבא שלי עייף | My fathre is tired. = My [father] is tired.
+F: אנחנו לא גרים כאן | We don't leave here. = We don't [live] here.
+T: אנחנו גרים בתל אביב = We [live] in Tel Aviv.
+T: אנחנו עוזבים מחר = We are [leaving] [tomorrow]. || We [leave] [tomorrow].
+F: הם גרים בבית גדול | The live in a big house. = [They] live in a big house.
+T: הם קראו את העיתון = [They] read the [newspaper].
+L: [grandmother]
 
 @rule SP03
 category: spelling
