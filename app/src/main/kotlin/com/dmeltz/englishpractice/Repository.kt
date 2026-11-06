@@ -130,6 +130,13 @@ class Repository private constructor(private val context: Context) {
 object BuildConfigInfo {
     fun versionName(context: Context): String =
         context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "?"
+
+    /** "Version 0.1.14 · built 6 Nov 2026, 22:15", in the phone's time zone. */
+    fun versionLabel(context: Context): String {
+        val built = java.text.SimpleDateFormat("d MMM yyyy, HH:mm", java.util.Locale.ENGLISH)
+            .format(java.util.Date(BuildConfig.BUILD_TIME))
+        return "Version ${versionName(context)} · built $built"
+    }
 }
 
 /** Pip's mood right now. */

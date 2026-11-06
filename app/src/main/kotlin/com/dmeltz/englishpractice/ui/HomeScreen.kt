@@ -31,6 +31,8 @@ import com.dmeltz.englishpractice.core.AppState
 import com.dmeltz.englishpractice.core.Mascot
 import com.dmeltz.englishpractice.core.SessionBuilder
 import com.dmeltz.englishpractice.core.sessionToContinue
+import com.dmeltz.englishpractice.BuildConfigInfo
+import androidx.compose.ui.platform.LocalContext
 import com.dmeltz.englishpractice.currentMood
 import com.dmeltz.englishpractice.today
 
@@ -111,6 +113,13 @@ fun HomeScreen(
             OutlinedButton(onClick = onProgress, modifier = Modifier.fillMaxWidth().height(48.dp)) {
                 Text("My progress")
             }
+            Spacer(Modifier.height(16.dp))
+            val context = LocalContext.current
+            Text(
+                BuildConfigInfo.versionLabel(context),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
