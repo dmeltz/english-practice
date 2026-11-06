@@ -240,6 +240,20 @@ private fun HebrewText(text: String) {
     )
 }
 
+/**
+ * Hints that name the word to use ("use: speak") are shown from the start, since several English words can
+ * translate the same Hebrew one and the item tests a specific one. They don't count as a hint.
+ */
+private val Item.wordToUse: String?
+    get() = hint?.trim()?.takeIf { it.startsWith("use:") }
+
+@Composable
+private fun WordToUse(item: Item) {
+    item.wordToUse?.let {
+        Text("Use the word: ${it.removePrefix("use:").trim()}", style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
 /** A "Show a hint" button; once pressed, the item's own hint (if any) and the first letter of each word. */
 @Composable
 private fun HintView(item: Item, shown: Boolean, onShow: () -> Unit) {
@@ -249,7 +263,7 @@ private fun HintView(item: Item, shown: Boolean, onShow: () -> Unit) {
     }
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            item.hint?.let { Text("Hint: $it", style = MaterialTheme.typography.bodyLarge) }
+            item.hint?.takeIf { item.wordToUse == null }?.let { Text("Hint: $it", style = MaterialTheme.typography.bodyLarge) }
             Text("Starts with: ${item.firstLetters}", style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -275,6 +289,7 @@ private fun QuestionView(entry: Entry, speaker: Speaker, onSubmit: (String, Bool
         ExerciseType.TRANSLATE -> {
             Text("Write in English", style = MaterialTheme.typography.titleMedium)
             HebrewText(item.hebrew.orEmpty())
+            WordToUse(item)
             HintView(item, shown = hinted, onShow = { hinted = true })
         }
         ExerciseType.LISTEN -> {
