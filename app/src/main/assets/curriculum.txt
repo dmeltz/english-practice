@@ -12,6 +12,7 @@ reminder: If the stress is earlier in the word, don't double.
 example: run → running, stop → stopped, big → bigger
 example: begin → beginning, prefer → preferred
 example: open → opening, visit → visited (no doubling)
+reminder: beginning has two n's: begin + n + ing. beGIN is stressed at the end, so the n doubles.
 reminder: Watch the stress: OPen → opened, VISit → visited (stress first, so no doubling); beGIN → beginning (stress last, so double).
 T: הם הפסיקו לדבר = They [stopped] talking. || They [stopped] speaking.
 T: אני רץ כל בוקר = I [run] every morning. || I go [running] every morning. ~ a habit, not something happening right now
@@ -51,6 +52,9 @@ T: היא הפסיקה לעשן = She [stopped] smoking.
 T: החנות נפתחת עכשיו = The shop is [opening] now. ~ use: open
 L: [bigger]
 L: [beginning]
+F: זו רק ההתחלה | It is only the begining. = It is only the [beginning].
+T: הסרט כבר מתחיל = The movie is already [beginning]. || The film is already [beginning]. ~ use: begin
+L: At the [beginning] of the day.
 
 @rule SP02
 category: spelling
@@ -102,6 +106,7 @@ title: My tricky words
 reminder: Words you misspelled in practice. No one rule covers them, so they get practice of their own.
 reminder: they (not "the"), movie (not "move"), newspaper = news + paper, language (langu-age), apartment (one p).
 reminder: father and grandmother end in -ther, tomorrow has one m and two r's, excitement keeps the c after ex.
+reminder: grandmother = grand + mother (not mather). your (שלך) has a u: y-o-u-r.
 reminder: live (גר, short i) vs leave (עוזב, long ee): We live here. We leave at eight.
 example: they were, a movie, the newspaper, three languages
 example: my father, my grandmother, a new apartment
@@ -132,6 +137,12 @@ T: אנחנו עוזבים מחר = We are [leaving] [tomorrow]. || We [leave] [
 F: הם גרים בבית גדול | The live in a big house. = [They] live in a big house.
 T: הם קראו את העיתון = [They] read the [newspaper].
 L: [grandmother]
+F: סבתא שלי נחמדה | My grandmather is nice. = My [grandmother] is nice.
+T: הבית שלך יפה = [Your] house is beautiful. || [Your] house is nice. || [Your] home is beautiful.
+F: הספר שלך כאן | Yore book is here. = [Your] book is here.
+T: הם שמחו = [They] were happy.
+T: ביקרנו את סבתא שלנו = We visited our [grandmother]. ~ grand + mother
+L: [Your] car is new.
 
 @rule SP03
 category: spelling
@@ -140,6 +151,7 @@ reminder: After c or g that sounds soft (like s or j), keep the e before -able a
 reminder: Without the e, the c or g would sound hard.
 example: notice → noticeable, manage → manageable
 example: courage → courageous, outrage → outrageous
+reminder: Build the long word from the short one and keep every letter: courage + ous = courageous, notice + able = noticeable.
 T: השינוי ניכר = The change is [noticeable].
 T: הבעיה ניתנת לטיפול = The problem is [manageable].
 T: היא אישה אמיצה = She is a [courageous] woman.
@@ -157,6 +169,14 @@ L: [advantageous]
 F: הוא מאוד בקיא | He is very knowledgable. = He is very [knowledgeable].
 F: זה לא ניתן להחלפה | It is not replacable. = It is not [replaceable].
 F: ההבדל ניכר | The difference is noticable. = The difference is [noticeable].
+F: הוא חייל אמיץ | He is a courages soldier. = He is a [courageous] soldier.
+F: היא החלטה אמיצה | It is a curageous decision. = It is a [courageous] decision.
+T: זה היה צעד אמיץ = It was a [courageous] step. || It was a [courageous] move. ~ use: courage + ous
+T: השיפור ניכר = The improvement is [noticeable]. ~ use: notice + able
+T: זה מחיר שערורייתי = That is an [outrageous] price. || It is an [outrageous] price. ~ means shocking; built from outrage
+L: That was very [courageous].
+L: [outrageous]
+L: [noticeable]
 
 @rule SP04
 category: spelling
@@ -615,7 +635,7 @@ reminder: Verbs of state (know, want, like, need, believe, understand, have = ow
 example: I usually drink tea, but now I am drinking coffee.
 example: I want coffee. (not "I am wanting")
 T: אני רוצה קפה = I [want] coffee. || I [want] a coffee. || I would like coffee. || I would like a coffee.
-T: אני עובד עכשיו = [I am working] now. || [I am working] at the moment.
+T: אני עובד עכשיו = [I am working] now. || [I am working] right now. || [I am working] at the moment.
 T: היא בדרך כלל הולכת ברגל = She usually [walks].
 T: מה אתה עושה עכשיו? = [What are you doing] now?
 T: אני מבין אותך = I [understand] you.
